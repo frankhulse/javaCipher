@@ -1,10 +1,10 @@
 /**************************************************************************
 Frank Hulse
 8/29/22
-Java Cipher 1.0
+Java Cipher 1.1
 ___________________________________________________________________________
 This program is designed to use a CLI to encrypt and decrypt small peices 
-of text.  Shift cipher is used here.  Non-letters are kept as is.
+of text.  Shift cipher is used here.  Non-letters are removed, numbers kept
 ___________________________________________________________________________
 Future plans:
 -Update program to use better cipher technology.
@@ -12,7 +12,7 @@ Future plans:
 -Implement a gui.
 	-Simple java swing for now.
 	-Online version (JavaScript?) should be different program
--Enc entire files?
+-Encrypt entire files?
 **************************************************************************/
 
 package javaCipher;
@@ -31,11 +31,13 @@ public class javaCipher
 		{
 			//Get char at position i
 			char c = text.charAt(i);
+			int x = (int)c;
 			
-			//Check if non letter, leave as non-letter
-			if ( (int)c < 65 || (int)c > 122 || ((int)c > 90 && (int)c < 97) ) 
+			//Check if number, leave as is
+			if (Character.isDigit(c))
 			{
 				output.append(c);
+				//System.out.println("number");
 				continue;
 			}
 			
@@ -43,17 +45,23 @@ public class javaCipher
 			if (Character.isUpperCase(c))
             {
 				//Convert to int, add key, back to char
-				char ch = (char)(((int)c + key - 65) % 26 + 65);
+				char ch = (char)((x + key - 65) % 26 + 65);
 				output.append(ch);
+				//System.out.println("UPPER");
+				continue;
             }
 			
 			//Char is lowercase, perform shift.
-			else
+			if (Character.isLowerCase(c))
             {
 				//Convert to int, add key, back to char
                 char ch = (char)((c + key - 97) % 26 + 97);
                 output.append(ch);
+                //System.out.println("lower");
+                continue;
             }
+			
+			//All other chars are excluded because we want to remove them.
 			
 		}
 		return output;
@@ -117,7 +125,7 @@ public class javaCipher
 				s.nextLine();
 				
 				//Get input text
-				System.out.print("Enter text to be encrypted: ");
+				System.out.print("Enter text to be decrypted: ");
 				String text = s.nextLine();
 				
 				//cleaning up format of output text
