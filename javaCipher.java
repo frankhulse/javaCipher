@@ -1,7 +1,7 @@
 /**************************************************************************
 Frank Hulse
 8/29/22
-Java Cipher 1.2
+Java Cipher 1.3
 ___________________________________________________________________________
 This program is designed to use a CLI to encrypt and decrypt small peices 
 of text.  Shift cipher is used here.  Non-letters are removed, numbers kept
@@ -13,7 +13,7 @@ Future plans:
 	-Simple java swing for now.
 	-Online version (JavaScript?) should be different program
 -Encrypt entire files?
-
+__________________________________________________________________________
 To Do:
 Update to 2.0
 	-Implement "keyword" cipher
