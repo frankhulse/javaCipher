@@ -32,9 +32,9 @@ package javaCipher;
 import java.util.Scanner;
 
 public class javaCipher
-{
+{	
 	//Shift Algorithm.  Works for both enc and dec
-	public static StringBuffer encrypt(String text, int key)
+	public static StringBuffer encrypt(int key, String text)
 	{
 		//Create a stringBuffer for output.  Easier to work with chars than string
 		StringBuffer output = new StringBuffer();
@@ -80,20 +80,62 @@ public class javaCipher
 		return output;
 	}
 	
+	//Method to get key input details from user
+	public static int inputKey()
+	{
+		//Create a scanner object
+		Scanner s1 = new Scanner(System.in);
+		
+		//get user input
+		System.out.print("Enter key/ shift size: ");
+		
+		//force user to input int
+		while (!s1.hasNextInt()) 
+		{
+		      System.out.println("Input is not a number.  ");
+		      System.out.print("Enter key/ shift size: ");
+		      s1.nextLine();
+		}
+		int k = s1.nextInt();
+		
+		return k;
+	}
+	
+	//Method to get key input details from user
+	public static String inputText()
+	{
+		//Create a scanner object
+		Scanner sc = new Scanner(System.in);
+			
+		//get user input.  We do not need to clean because encrypt() does that for text
+		System.out.print("Enter text: ");
+		String t = sc.nextLine();
+			
+		return t;
+	}
+	
 	//Main runner class
 	public static void main(String[] args) 
 	{
 		//Create a scanner object
 		Scanner s = new Scanner(System.in);
-
+		
 		//infinate loop to keep running enc and dec until user enters 0
 		while (true) 
 		{
 			System.out.print("Press 1 to Encrypt, 2 to Decrypt, or 0 to exit: ");
-			int response = s.nextInt();  // Read user input
+			
+			while (!s.hasNextInt()) 
+			{
+				System.out.println("ERROR: Invalid menu option please try again.");
+			    System.out.print("Press 1 to Encrypt, 2 to Decrypt, or 0 to exit: ");
+			    s.nextLine();
+			}
+			int response = s.nextInt();
+			
 			
 			//Exit program
-			if (response < 1)
+			if (response == 0)
 			{
 				System.out.println("Exiting System...");
 				break;
@@ -101,27 +143,9 @@ public class javaCipher
 			
 			//Encrypt
 			else if (response == 1) 
-			{
-				//get key size
-				System.out.print("Enter key/ shift size: ");
-				int key = s.nextInt();
-								
-				//Move scanner to next line
-				s.nextLine();
-				
-				//Get input text
-				System.out.print("Enter text to be encrypted: ");
-				String text = s.nextLine();
-				
-				//cleaning up format of output text
-				System.out.println();
-				
-				//Output params
-				System.out.println("Key: " + key);
-				System.out.println("Text: " + text);
-				
+			{				
 				//output encrypted string
-				System.out.println("Output: " + encrypt(text, key));	
+				System.out.println("Output: " + encrypt(inputKey(), inputText() ));	
 				
 				//cleaning up format of output text
 				System.out.println();
@@ -129,30 +153,9 @@ public class javaCipher
 			
 			//Decrypt
 			else if (response == 2) 
-			{
-				//get key size
-				System.out.print("Enter key/ shift size: ");
-				int key = s.nextInt();
-								
-				//Move scanner to next line
-				s.nextLine();
-				
-				//Get input text
-				System.out.print("Enter text to be decrypted: ");
-				String text = s.nextLine();
-				
-				//cleaning up format of output text
-				System.out.println();
-				
-				//Output params
-				System.out.println("Key: " + key);
-				System.out.println("Text: " + text);
-				
-				//get correct key size
-				key = key % 26;
-				
+			{				
 				//output encrypted string
-				System.out.println("Output: " + encrypt(text, 26 - key));	
+				System.out.println("Output: " + encrypt(26 - inputKey(), inputText() ));	
 				
 				//cleaning up format of output text
 				System.out.println();
