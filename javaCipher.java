@@ -1,27 +1,27 @@
 /**************************************************************************
 Frank Hulse
 8/29/22
-Java Cipher 1.3
+Java Cipher 2.0
 ___________________________________________________________________________
 This program is designed to use a CLI to encrypt and decrypt small peices 
-of text.  Shift cipher is used here.  Non-letters are removed, numbers kept
+of text.  A modified vigenere cipher is used here.  Non-letters are removed.
+
+CipherText = key(i % keyLength) + plainText(i) 
+PlainText = CipherText(i) - key(i % keyLength)
 ___________________________________________________________________________
 Future plans:
 -Update program to use better cipher technology.
-	-keyword cipher functionality for ease of use
 -Implement a gui.
-	-Simple java swing for now.
+	-Simple java swing for now?
 	-Online version (JavaScript?) should be different program
 -Encrypt entire files?
 __________________________________________________________________________
 To Do:
-Update to 2.0
-	-Implement "keyword" cipher
-	-plain + keyword(i) = enc
-	-learn how to fight this type of cipher.
-		-freq analysis shouldnt be an issue, what is?
-		-how long does it take to brute force?
-			-how does this compare with longer key lengths?
+Update to 2.1
+-learn how to fight this type of cipher.
+	-freq analysis shouldnt be an issue, what is?
+	-how long does it take to brute force?
+		-how does this compare with longer key lengths?
 			
 Update to 3.0
 	-Add simple java gui
@@ -33,70 +33,88 @@ import java.util.Scanner;
 
 public class javaCipher
 {	
-	//Shift Algorithm.  Works for both enc and dec
-	public static StringBuffer encrypt(int key, String text)
+	//ENC Algorithm
+	public static StringBuffer encrypt(String key, String text)
 	{
 		//Create a stringBuffer for output.  Easier to work with chars than string
 		StringBuffer output = new StringBuffer();
 		
+		int l = key.length();
+		
 		//loop through text for encryption
 		for (int i = 0; i < text.length(); i++)
 		{
-			//Get char at position i
-			char c = text.charAt(i);
-			int x = (int)c;
+			//Get characters to add
+			char t = text.charAt(i);
+			char k = key.charAt(i % l);
 			
-			//Check if number, leave as is
-			if (Character.isDigit(c))
-			{
-				output.append(c);
-				//System.out.println("number");
-				continue;
-			}
+			//System.out.print("t: " + t + " ");
+			//System.out.print("k: " + k + " ");
 			
-			//Check uppercase, perform shift leave uppercase.
-			if (Character.isUpperCase(c))
-            {
-				//Convert to int, add key, back to char
-				char ch = (char)((x + key - 65) % 26 + 65);
-				output.append(ch);
-				//System.out.println("UPPER");
-				continue;
-            }
+			//Add and convert to (0-25)
+			int ans = (t + k) % 26;
+			//System.out.print("ans: " + ans + " ");
 			
-			//Char is lowercase, perform shift.
-			if (Character.isLowerCase(c))
-            {
-				//Convert to int, add key, back to char
-                char ch = (char)((c + key - 97) % 26 + 97);
-                output.append(ch);
-                //System.out.println("lower");
-                continue;
-            }
+			//Add back to A
+			ans += 'A';
 			
-			//All other chars are excluded because we want to remove them.
+			char ch = (char)ans;
 			
+			//System.out.println("ch: " + ch);
+			output.append(ch);
 		}
+		
 		return output;
 	}
 	
+	//DEC Algorithm
+	public static StringBuffer decrypt(String key, String text)
+	{
+		//Create a stringBuffer for output.  Easier to work with chars than string
+		StringBuffer output = new StringBuffer();
+		
+		int l = key.length();
+		
+		//loop through text for encryption
+		for (int i = 0; i < text.length(); i++)
+		{
+			//Get characters to subtract
+			char t = text.charAt(i);
+			char k = key.charAt(i % l);
+			
+			//System.out.print("t: " + (int)t + " ");
+			//System.out.print("k: " + k + " ");
+			
+			//Add and convert to (0-25)
+			int ans = ((t - k) + 26) % 26;
+			//System.out.print("ans: " + ans + " ");
+			
+			//Add back to A
+			ans += 'A';
+				
+			char ch = (char)ans;
+				
+			//System.out.println("ch: " + ch);
+			output.append(ch);
+		}
+			
+		return output;
+		}
+	
 	//Method to get key input details from user
-	public static int inputKey()
+	public static String inputKey()
 	{
 		//Create a scanner object
 		Scanner s1 = new Scanner(System.in);
 		
-		//get user input
-		System.out.print("Enter key/ shift size: ");
+		//get user input.
+		System.out.print("Enter Key: ");
+		String k = s1.nextLine();
 		
-		//force user to input int
-		while (!s1.hasNextInt()) 
-		{
-		      System.out.println("Input is not a number.  ");
-		      System.out.print("Enter key/ shift size: ");
-		      s1.nextLine();
-		}
-		int k = s1.nextInt();
+		//Clean up input
+		k = k.toUpperCase();
+		k = k.replaceAll("\\s", "");
+		k = k.replaceAll("[0-9]", "");
 		
 		return k;
 	}
@@ -107,10 +125,16 @@ public class javaCipher
 		//Create a scanner object
 		Scanner sc = new Scanner(System.in);
 			
-		//get user input.  We do not need to clean because encrypt() does that for text
+		//get user input.
 		System.out.print("Enter text: ");
 		String t = sc.nextLine();
-			
+		
+		//clean up input
+		t = t.toUpperCase();
+		t = t.replaceAll("\\s", "");
+		t = t.replaceAll("[0-9]", "");
+	
+		
 		return t;
 	}
 	
@@ -125,6 +149,7 @@ public class javaCipher
 		{
 			System.out.print("Press 1 to Encrypt, 2 to Decrypt, or 0 to exit: ");
 			
+			//Force user to enter an Int.  If something else is entered get error message.
 			while (!s.hasNextInt()) 
 			{
 				System.out.println("ERROR: Invalid menu option please try again.");
@@ -155,7 +180,7 @@ public class javaCipher
 			else if (response == 2) 
 			{				
 				//output encrypted string
-				System.out.println("Output: " + encrypt(26 - inputKey(), inputText() ));	
+				System.out.println("Output: " + decrypt(inputKey(), inputText() ));	
 				
 				//cleaning up format of output text
 				System.out.println();
